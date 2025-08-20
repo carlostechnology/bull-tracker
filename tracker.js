@@ -1,16 +1,11 @@
-// Template-matching tracker (sin IA) con normalised cross-correlation (NCC).
-// Flujo: el usuario dibuja un rectángulo -> guardamos esa plantilla (grayscale).
-// En cada frame, buscamos la mejor coincidencia en una ventana alrededor de la última posición.
-
+// Template-matching tracker (sin IA) con correlación normalizada.
 export class TemplateTracker {
   constructor() {
-    this.template = null; // {w,h,dataFloat}
+    this.template = null; // {w,h,data}
     this.pos = null;      // [cx, cy] en px
-    this.win = 64;        // tamaño de ventana de búsqueda (radio)
-    this.scale = 1;       // factor de downscale para velocidad
+    this.win = 64;        // ventana de búsqueda (radio)
   }
   initFromCanvas(ctx, rect) {
-    // rect: {x,y,w,h} en px, usamos una versión reducida para acelerar
     const {x,y,w,h} = rect;
     const img = ctx.getImageData(x, y, w, h);
     const gray = new Float32Array(w*h);
@@ -27,22 +22,19 @@ export class TemplateTracker {
     const win = this.win;
     let best = {score: -1, x: 0, y: 0};
 
-    // limitar búsqueda a ventana dentro del canvas
     const x0 = Math.max(0, Math.floor(cx - win));
     const y0 = Math.max(0, Math.floor(cy - win));
     const x1 = Math.min(W - this.template.w, Math.floor(cx + win));
     const y1 = Math.min(H - this.template.h, Math.floor(cy + win));
 
     const tw = this.template.w, th = this.template.h, tdata = this.template.data;
-    // precomputar media/norm de la plantilla
     let tmean = 0; for (let v of tdata) tmean += v; tmean /= tdata.length;
     let tnorm = 0; for (let v of tdata){ const d=v - tmean; tnorm += d*d; }
     tnorm = Math.sqrt(tnorm) + 1e-6;
 
-    for (let yy=y0; yy<=y1; yy+=2){ // saltos de 2 px para ganar velocidad
+    for (let yy=y0; yy<=y1; yy+=2){
       for (let xx=x0; xx<=x1; xx+=2){
         const img = ctx.getImageData(xx, yy, tw, th);
-        // convertir a gris y NCC
         let imean = 0;
         const g = new Float32Array(tw*th);
         for (let i=0,j=0;i<img.data.length;i+=4,j++){
@@ -64,7 +56,6 @@ export class TemplateTracker {
         }
       }
     }
-    // actualizar centro y suavizar un poco
     const bx = best.x + tw/2;
     const by = best.y + th/2;
     this.pos = [0.6*bx + 0.4*cx, 0.6*by + 0.4*cy];
