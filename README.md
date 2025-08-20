@@ -1,4 +1,4 @@
-# Bull Distance Tracker — Sin IA (Plantilla)
+# Bull Distance Tracker
 
 Este proyecto está **listo para usar** sin descargar modelos ni conectarse a internet.
 Funciona 100% en el navegador y usa un **seguimiento por plantilla** (template matching) en vez de una IA pesada.
