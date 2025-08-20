@@ -3,91 +3,47 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bull Tracker — Sin IA (Plantilla)</title>
+  <title>Bull Tracker — Sin IA</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
-    <h1>Bull Distance Tracker — <span class="tag">Sin IA</span> (seguimiento por plantilla)</h1>
-  </header>
+  <h1>Bull Distance Tracker — Sin IA (móvil + PC)</h1>
 
-  <main>
-    <section id="left">
-      <div class="video-wrap">
-        <video id="video" autoplay playsinline muted></video>
-        <canvas id="overlay"></canvas>
-      </div>
-      <div id="hud">
-        <div><strong>Estado:</strong> <span id="status">Inicializando…</span></div>
-        <div><strong>FPS:</strong> <span id="fps">0</span></div>
-        <div><strong>Distancia:</strong> <span id="distance">0.00</span> m</div>
-      </div>
-    </section>
+  <div id="container">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="overlay"></canvas>
+  </div>
 
-    <section id="right">
-      <div class="panel">
-        <h2>1) Cámara</h2>
-        <button id="btnStart">Iniciar cámara</button>
-        <label><input type="checkbox" id="chkBackCam" checked> Cámara trasera (móvil)</label>
-      </div>
+  <div id="controls">
+    <fieldset>
+      <legend>Cámara</legend>
+      <button id="btnStart">Iniciar cámara</button>
+      <label><input type="checkbox" id="chkBackCam" checked> Cámara trasera (móvil)</label>
+      <div class="status">Estado: <span id="status">Esperando…</span></div>
+      <div class="readout">FPS: <span id="fps">0</span> · Distancia en vivo: <span id="distance">0.00</span> m</div>
+      <div class="readout final">Distancia final: <span id="finalDistance">—</span></div>
+    </fieldset>
 
-      <div class="panel">
-        <h2>2) Calibración (modo círculo)</h2>
-        <ol>
-          <li>Haz clic en <strong>4 puntos del borde</strong> del ruedo en orden <em>N, E, S, O</em>.</li>
-          <li>Introduce el <strong>diámetro real</strong> (m).</li>
-          <li>Pulsa <strong>Calcular homografía</strong>.</li>
-        </ol>
-        <div class="grid">
-          <div>Px N: <span id="cN">–</span></div>
-          <div>Px E: <span id="cE">–</span></div>
-          <div>Px S: <span id="cS">–</span></div>
-          <div>Px O: <span id="cW">–</span></div>
-        </div>
-        <div>Diámetro (m): <input id="diam" type="number" step="0.01" value="60"></div>
-        <div class="row">
-          <button id="btnResetPts">Reset puntos</button>
-          <button id="btnComputeH">Calcular homografía</button>
-        </div>
-        <div class="status small">H: <span id="Hval">–</span></div>
-      </div>
+    <fieldset>
+      <legend>Calibración (círculo)</legend>
+      <p>Haz 4 toques/clics en el borde del ruedo en orden <strong>N</strong>, <strong>E</strong>, <strong>S</strong>, <strong>O</strong>.</p>
+      <div>N: <span id="cN">–</span> &nbsp; E: <span id="cE">–</span> &nbsp; S: <span id="cS">–</span> &nbsp; O: <span id="cW">–</span></div>
+      <label>Diámetro (m): <input id="diam" type="number" step="0.01" value="60"></label><br/>
+      <button id="btnResetPts">Reset puntos</button>
+      <button id="btnComputeH">Calcular homografía</button>
+      <div>H: <span id="Hval">–</span></div>
+      <small>Consejo: la cámara debe estar fija para que la homografía se mantenga válida.</small>
+    </fieldset>
 
-      <div class="panel">
-        <h2>3) Seguimiento (sin IA)</h2>
-        <ol>
-          <li><strong>Arrastra</strong> un rectángulo sobre el toro en el vídeo para iniciar el seguimiento.</li>
-          <li>Pulsa <strong>Empezar</strong> para registrar la trayectoria y la distancia.</li>
-        </ol>
-        <div class="row">
-          <button id="btnStartRun" disabled>Empezar</button>
-          <button id="btnStopRun" disabled>Parar</button>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>4) Exportar</h2>
-        <div class="row">
-          <button id="btnDownloadCSV" disabled>CSV</button>
-          <button id="btnDownloadSVG" disabled>SVG (círculo + recorrido)</button>
-        </div>
-      </div>
-
-      <div class="panel small">
-        <details>
-          <summary>Consejos</summary>
-          <ul>
-            <li>Cámara <strong>fija</strong> y buena luz → mejor seguimiento.</li>
-            <li>Si se pierde el objetivo, vuelve a <em>arrastrar</em> una plantilla nueva.</li>
-            <li>La línea del ruedo se dibuja como <strong>elipse</strong> (proyección del círculo real).</li>
-          </ul>
-        </details>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <small>Todo offline, sin modelos ni descargas externas · MIT</small>
-  </footer>
+    <fieldset>
+      <legend>Seguimiento y exportación</legend>
+      <p><strong>Arrastra</strong> con ratón o dedo un rectángulo sobre el toro para iniciar el seguimiento por plantilla.</p>
+      <button id="btnStartRun" disabled>Empezar</button>
+      <button id="btnStopRun" disabled>Parar</button>
+      <button id="btnDownloadCSV" disabled>CSV</button>
+      <button id="btnDownloadSVG" disabled>SVG</button>
+    </fieldset>
+  </div>
 
   <script type="module" src="homography.js"></script>
   <script type="module" src="tracker.js"></script>
