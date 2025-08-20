@@ -1,10 +1,4 @@
-// app.js — Bull Tracker (sin IA, con soporte móvil)
-// - Calibración por círculo (N,E,S,O + diámetro)
-// - Seguimiento por plantilla (arrastrar rectángulo)
-// - Dibujo en tiempo real del recorrido
-// - Exportación CSV / SVG
-// - Control táctil (Pointer Events) para móvil
-
+// app.js — Bull Tracker (sin IA, con soporte móvil) + Distancia final explícita
 import { computeHomography4, applyHomography, invertHomography } from './homography.js';
 import { TemplateTracker } from './tracker.js';
 
@@ -14,6 +8,7 @@ const els = {
   status: document.getElementById('status'),
   fps: document.getElementById('fps'),
   dist: document.getElementById('distance'),
+  finalDist: document.getElementById('finalDistance'),
   btnStart: document.getElementById('btnStart'),
   chkBackCam: document.getElementById('chkBackCam'),
 
@@ -36,19 +31,19 @@ const els = {
 
 let running = false;
 let H = null, Hinv = null;
-let clicks = [];                      // puntos N,E,S,O (en píxeles)
-let tracker = new TemplateTracker();  // seg. por plantilla (sin IA)
+let clicks = [];
+let tracker = new TemplateTracker();
 
-// Interacción para arrastrar rectángulo (PC/móvil)
 let dragging = false, dragStart = null, dragRect = null;
 
-// Métricas / registro
-let distance = 0, lastPtM = null;
+// Métricas
+let distance = 0;
 let trailPx = [], trailM = [];
 let csv = [["t_ms","x_m","y_m","dist_m"]];
 
 function updateStatus(s){ els.status.textContent = s; }
 function updateDist(){ els.dist.textContent = distance.toFixed(2); }
+function setFinalDist(val){ els.finalDist.textContent = typeof val === 'number' ? val.toFixed(2)+' m' : '—'; }
 
 // -------------------- Sizing vídeo/canvas --------------------
 function resizeCanvas(){
@@ -63,10 +58,7 @@ window.addEventListener('resize', resizeCanvas);
 
 // -------------------- Cámara --------------------
 els.btnStart.addEventListener('click', async ()=>{
-  const constraints = {
-    audio: false,
-    video: { facingMode: els.chkBackCam.checked ? { exact: 'environment' } : 'user' }
-  };
+  const constraints = { audio:false, video:{ facingMode: els.chkBackCam.checked ? { exact: 'environment' } : 'user' } };
   try{
     const s = await navigator.mediaDevices.getUserMedia(constraints);
     els.video.srcObject = s;
@@ -126,15 +118,16 @@ function drawOverlay(){
 }
 
 // -------------------- Calibración círculo --------------------
-els.btnResetPts.addEventListener('click', ()=>{
+function resetAll(){
   clicks = [];
   [els.cN,els.cE,els.cS,els.cW].forEach(el => el.textContent = '–');
   H = null; Hinv = null; els.Hval.textContent = '–';
-  lastPtM = null; distance = 0; updateDist();
+  distance = 0; updateDist(); setFinalDist(null);
   trailPx = []; trailM = []; csv = [["t_ms","x_m","y_m","dist_m"]];
   els.btnStartRun.disabled = true; els.btnDownloadCSV.disabled = true; els.btnDownloadSVG.disabled = true;
   drawOverlay();
-});
+}
+els.btnResetPts.addEventListener('click', resetAll);
 
 els.btnComputeH.addEventListener('click', ()=>{
   if (clicks.length !== 4){ alert('Haz 4 clics en el borde del ruedo en orden N, E, S, O'); return; }
@@ -165,11 +158,13 @@ function getXYFromEvent(ev){
   return [x,y];
 }
 
+let draggingActive = false;
+
 els.overlay.addEventListener('pointerdown', (ev)=>{
-  ev.preventDefault();                 // evita scroll en móvil
+  ev.preventDefault();
   els.overlay.setPointerCapture(ev.pointerId);
   const [x,y] = getXYFromEvent(ev);
-  dragging = true; dragStart = [x,y]; dragRect = null;
+  dragging = true; draggingActive = true; dragStart = [x,y]; dragRect = null;
 });
 
 els.overlay.addEventListener('pointermove', (ev)=>{
@@ -205,11 +200,20 @@ els.overlay.addEventListener('pointerup', (ev)=>{
   }
   dragRect = null;
   drawOverlay();
+  draggingActive = false;
 });
 
 // -------------------- Medición (loop) --------------------
-els.btnStartRun.addEventListener('click', ()=>{ running = true; loop(); els.btnStopRun.disabled=false; els.btnStartRun.disabled=true; });
-els.btnStopRun.addEventListener('click', ()=>{ running = false; els.btnStartRun.disabled=false; els.btnStopRun.disabled=true; els.btnDownloadCSV.disabled=false; els.btnDownloadSVG.disabled=false; });
+els.btnStartRun.addEventListener('click', ()=>{ distance = distance || 0; setFinalDist(null); running = true; loop(); els.btnStopRun.disabled=false; els.btnStartRun.disabled=true; });
+els.btnStopRun.addEventListener('click', ()=>{
+  running = false;
+  els.btnStartRun.disabled=false; els.btnStopRun.disabled=true; els.btnDownloadCSV.disabled=false; els.btnDownloadSVG.disabled=false;
+  // Mostrar distancia final
+  setFinalDist(distance);
+  alert('Distancia final: ' + distance.toFixed(2) + ' m');
+  // Añadir fila TOTAL al CSV
+  csv.push(['TOTAL','','', distance.toFixed(4)]);
+});
 
 els.btnDownloadCSV.addEventListener('click', ()=>{
   const blob = new Blob([csv.map(r=>r.join(',')).join('\n')], {type:'text/csv'});
@@ -224,6 +228,7 @@ els.btnDownloadSVG.addEventListener('click', ()=>{
   const path = trailM.map((p,i)=> (i?'L':'M') + p[0].toFixed(3)+','+(-p[1]).toFixed(3)).join(' ');
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="${minX} ${-(R+margin)} ${size} ${size}" width="1000" height="1000">
+  <title>Trayectoria · Distancia total: ${distance.toFixed(2)} m</title>
   <g stroke-width="0.05" fill="none">
     <circle cx="0" cy="0" r="${R}" stroke="#888" />
     <path d="${path}" stroke="#0cf" />
