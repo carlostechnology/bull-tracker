@@ -1,6 +1,14 @@
 /* =========================
-   Estilos Bull Tracker
+   Estilos Bull Tracker (mobile fix)
    ========================= */
+
+/* Evitar selección y menús táctiles en toda la página (iOS/safari) */
+html, body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  overscroll-behavior: none;
+}
 
 body {
   margin: 0;
@@ -38,7 +46,8 @@ body {
   background: transparent;
 
   /* 👇 claves para móvil */
-  touch-action: none;          /* no scroll mientras arrastras */
+  touch-action: none;          /* no scroll/zoom mientras arrastras */
+  -ms-touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   pointer-events: auto;
