@@ -1,28 +1,88 @@
-# Bull Distance Tracker
+# 🐂 Bull Tracker — Wizard
 
-Este proyecto está **listo para usar** sin descargar modelos ni conectarse a internet.
-Funciona 100% en el navegador y usa un **seguimiento por plantilla** (template matching) en vez de una IA pesada.
+Aplicación web para medir la **distancia recorrida por un toro** en la plaza, usando únicamente la cámara del dispositivo móvil y visión por computador **sin necesidad de IA en servidor**.
 
-## Funciones
-- **Cámara** con `getUserMedia`.
-- **Calibración por círculo**: clic en 4 puntos (N,E,S,O) + diámetro → homografía a metros.
-- **Seguimiento sin IA**: arrastra un rectángulo sobre el toro y el sistema lo sigue por **correlación normalizada**.
-- **Trayectoria en tiempo real** sobre el vídeo.
-- **Distancia acumulada** en metros.
-- **Exportación** a **CSV** (t, X, Y, dist) y **SVG** (círculo y recorrido en coordenadas métricas).
+Optimizada para **teléfonos móviles** con flujo guiado paso a paso.
 
-## Uso
-1. Abre `index.html` (mejor sobre **HTTPS** para permisos de cámara en móvil).  
-2. **Iniciar cámara**.
-3. En el vídeo:  
-   - **Calibración**: clic en 4 puntos del borde del ruedo (N, E, S, O), pon el diámetro real, y pulsa **Calcular homografía**.  
-   - **Seguimiento**: **arrastra** un rectángulo sobre el toro para inicializar el tracker.  
-4. Pulsa **Empezar** para registrar recorrido y distancia. **Parar** para habilitar descargas.
-5. Descarga **CSV/SVG**.
+---
 
-## Consejos
-- Cámara **fija**, buena luz y un rectángulo que incluya el toro con poco fondo mejoran el seguimiento.
-- Si el toro cambia mucho de tamaño o hay oclusiones, vuelve a **arrastrar** una plantilla nueva.
-- El máximo realismo de distancia depende de una **buena calibración**.
+## 🚀 Funcionalidad
 
-Licencia: MIT.
+1. **Inicio**
+   - Pantalla de bienvenida con botón *Iniciar cámara y calibrar*.
+
+2. **Calibración**
+   - El usuario marca **4 puntos** en el borde del ruedo en orden: **Norte, Este, Sur, Oeste**.
+   - Se introduce el diámetro real de la plaza (m).
+   - Se calcula la **homografía** para convertir coordenadas de píxeles en coordenadas reales.
+
+3. **Selección del toro**
+   - El usuario arrastra un **rectángulo de selección** sobre el toro.
+   - Se guarda una **plantilla** para hacer seguimiento cuadro a cuadro.
+
+4. **Seguimiento**
+   - El sistema sigue la posición del toro en tiempo real.
+   - Se traza la trayectoria sobre el ruedo.
+   - Se acumula la **distancia recorrida**.
+
+5. **Resultados**
+   - Se muestra la **distancia total** en metros.
+   - Botones para exportar:
+     - **CSV** con datos (tiempo, coordenadas, distancia acumulada).
+     - **SVG** con trayectoria escalada al ruedo real.
+     - **Compartir** (usa Web Share API en móviles).
+
+---
+
+## 📱 Usabilidad móvil
+
+- Flujo tipo **wizard** paso a paso (no todos los botones a la vez).
+- Botones grandes, flotantes y de colores (verde = iniciar, rojo = parar, azul = exportar, naranja = procesar).
+- Mensajes en overlay guían al usuario en cada fase.
+- Compatible con gestos táctiles (arrastrar rectángulo con el dedo).
+- Bloqueo de gestos no deseados (scroll, pinch-zoom, selección de texto).
+
+---
+
+## 📦 Instalación y uso
+
+1. **Clonar o descargar este repositorio**.
+2. Subir los archivos a un hosting estático (ejemplo: **GitHub Pages**).
+   - Ajustar en GitHub → *Settings* → *Pages* → *Branch: main /root*.
+3. Abrir la URL desde el **móvil** y conceder permisos de cámara.
+
+👉 Ejemplo de URL en GitHub Pages:  
+`https://tuusuario.github.io/bull-tracker-wizard/`
+
+---
+
+## 📝 Archivos principales
+
+- `index.html` → estructura de pantallas (wizard).
+- `styles.css` → estilos móviles (modo oscuro).
+- `app.js` → lógica principal (flujo paso a paso, tracking, exportaciones).
+- `tracker.js` → seguimiento por plantilla.
+- `homography.js` → cálculo y aplicación de homografía.
+- `README.md` → este documento.
+
+---
+
+## ⚠️ Limitaciones
+
+- El seguimiento usa **template matching** simple (no IA avanzada).
+- Iluminación cambiante o movimiento brusco de cámara pueden reducir precisión.
+- El diámetro del ruedo debe introducirse correctamente para calibración.
+- No distingue automáticamente al toro: requiere selección manual.
+
+---
+
+## 🌟 Ideas futuras
+
+- Integrar modelo ligero de **detección automática de toros** (YOLO-Nano u ONNX en navegador).
+- Modo **demo** para cargar vídeos locales sin cámara.
+- Mejorar exportación con informes en PDF.
+- Añadir métricas adicionales (velocidad media, nº de vueltas, calorías estimadas 😉).
+
+---
+
+© 2025 — Proyecto educativo y experimental.
