@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bull Tracker</title>
+  <title>Bull Tracker — Sin IA</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>Bull Distance Tracker</h1>
+  <h1>Bull Distance Tracker — Sin IA (móvil + PC)</h1>
 
   <div id="container">
     <video id="video" autoplay playsinline muted></video>
@@ -17,7 +17,7 @@
   <div id="controls">
     <fieldset>
       <legend>Cámara</legend>
-      <button id="btnStart">Iniciar cámara</button>
+      <button id="btnStart" class="btn-green">Iniciar cámara</button>
       <label><input type="checkbox" id="chkBackCam" checked> Cámara trasera (móvil)</label>
       <div class="status">Estado: <span id="status">Esperando…</span></div>
       <div class="readout">FPS: <span id="fps">0</span> · Distancia en vivo: <span id="distance">0.00</span> m</div>
@@ -29,8 +29,8 @@
       <p>Haz 4 toques/clics en el borde del ruedo en orden <strong>N</strong>, <strong>E</strong>, <strong>S</strong>, <strong>O</strong>.</p>
       <div>N: <span id="cN">–</span> &nbsp; E: <span id="cE">–</span> &nbsp; S: <span id="cS">–</span> &nbsp; O: <span id="cW">–</span></div>
       <label>Diámetro (m): <input id="diam" type="number" step="0.01" value="60"></label><br/>
-      <button id="btnResetPts">Reset puntos</button>
-      <button id="btnComputeH">Calcular homografía</button>
+      <button id="btnResetPts" class="btn-red">Reset puntos</button>
+      <button id="btnComputeH" class="btn-orange">Calcular homografía</button>
       <div>H: <span id="Hval">–</span></div>
       <small>Consejo: la cámara debe estar fija para que la homografía se mantenga válida.</small>
     </fieldset>
@@ -38,10 +38,10 @@
     <fieldset>
       <legend>Seguimiento y exportación</legend>
       <p><strong>Arrastra</strong> con ratón o dedo un rectángulo sobre el toro para iniciar el seguimiento por plantilla.</p>
-      <button id="btnStartRun" disabled>Empezar</button>
-      <button id="btnStopRun" disabled>Parar</button>
-      <button id="btnDownloadCSV" disabled>CSV</button>
-      <button id="btnDownloadSVG" disabled>SVG</button>
+      <button id="btnStartRun" disabled class="btn-green">Empezar</button>
+      <button id="btnStopRun" disabled class="btn-red">Parar</button>
+      <button id="btnDownloadCSV" disabled class="btn-blue">CSV</button>
+      <button id="btnDownloadSVG" disabled class="btn-blue">SVG</button>
     </fieldset>
   </div>
 

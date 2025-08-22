@@ -1,5 +1,5 @@
 /* =========================
-   Estilos Bull Tracker (mobile fix)
+   Estilos Bull Tracker (mobile fix + colored buttons)
    ========================= */
 
 /* Evitar selección y menús táctiles en toda la página (iOS/safari) */
@@ -70,6 +70,7 @@ h1 {
   text-align: center;
 }
 
+/* Base de botones */
 button {
   margin: 5px 6px 5px 0;
   padding: 8px 14px;
@@ -79,15 +80,31 @@ button {
   color: #eee;
   cursor: pointer;
   font-size: 0.95em;
-  transition: background 0.2s;
+  transition: transform 0.05s ease, background 0.2s;
 }
 button:hover:not(:disabled) {
-  background: #666;
+  transform: translateY(-1px);
+}
+button:active:not(:disabled) {
+  transform: translateY(0);
 }
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Colores por tipo de botón */
+button.btn-green { background: #4CAF50; color: #fff; }
+button.btn-green:hover:not(:disabled) { background: #45a049; }
+
+button.btn-red { background: #f44336; color: #fff; }
+button.btn-red:hover:not(:disabled) { background: #da190b; }
+
+button.btn-blue { background: #2196F3; color: #fff; }
+button.btn-blue:hover:not(:disabled) { background: #0b7dda; }
+
+button.btn-orange { background: #FF9800; color: #fff; }
+button.btn-orange:hover:not(:disabled) { background: #e68a00; }
 
 input[type="number"], input[type="text"] {
   width: 100px;

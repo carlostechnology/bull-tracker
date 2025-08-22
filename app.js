@@ -94,7 +94,6 @@ function drawOverlay(){
   drawTrail(ctx);
 }
 
-// Reset/calibración
 function resetAll(){
   clicks = []; [els.cN,els.cE,els.cS,els.cW].forEach(el => el.textContent = '–');
   H = null; Hinv = null; els.Hval.textContent = '–';
@@ -113,7 +112,6 @@ els.btnComputeH.addEventListener('click', ()=>{
   catch(e){ alert('Error homografía: '+e.message); }
 });
 
-// Pointer Events con {passive:false} y cancel
 function getXYFromEvent(ev){
   const rect = els.overlay.getBoundingClientRect();
   const cw = els.overlay.width, ch = els.overlay.height;
@@ -158,22 +156,17 @@ function onPointerUp(ev){
   }
   dragRect = null; drawOverlay();
 }
-function onPointerCancel(ev){
-  dragging = false; dragRect = null; drawOverlay();
-}
+function onPointerCancel(ev){ dragging = false; dragRect = null; drawOverlay(); }
 
-// Registrar con {passive:false}
 els.overlay.addEventListener('pointerdown', onPointerDown, { passive:false });
 els.overlay.addEventListener('pointermove', onPointerMove, { passive:false });
 els.overlay.addEventListener('pointerup', onPointerUp, { passive:false });
 els.overlay.addEventListener('pointercancel', onPointerCancel, { passive:false });
 
-// Bloquear gestos de zoom de Safari/iOS (opcional)
 ['gesturestart','gesturechange','gestureend'].forEach(evt =>
   els.overlay.addEventListener(evt, e => e.preventDefault(), { passive:false }));
 els.overlay.addEventListener('dblclick', e => e.preventDefault(), { passive:false });
 
-// Medición
 els.btnStartRun.addEventListener('click', ()=>{ distance = distance || 0; setFinalDist(null); running = true; loop(); els.btnStopRun.disabled=false; els.btnStartRun.disabled=true; });
 els.btnStopRun.addEventListener('click', ()=>{
   running = false;
@@ -241,4 +234,4 @@ async function loop(){
   requestAnimationFrame(loop);
 }
 
-updateStatus('Listo: inicia cámara, calibra el círculo (N,E,S,O) y ARRÁSTRA con ratón o dedo para seleccionar la plantilla.');
+updateStatus('Listo: inicia cámara (verde), calibra el círculo y ARRÁSTRA con ratón o dedo. Usa PARAR (rojo) para terminar.');
