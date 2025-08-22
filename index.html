@@ -2,48 +2,95 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bull Tracker — Sin IA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Bull Tracker — Wizard</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>Bull Distance Tracker — Sin IA (móvil + PC)</h1>
+  <header class="appbar">
+    <h1>Bull Tracker</h1>
+  </header>
 
-  <div id="container">
-    <video id="video" autoplay playsinline muted></video>
-    <canvas id="overlay"></canvas>
-  </div>
+  <main id="app">
+    <!-- WELCOME -->
+    <section id="screen-welcome" class="screen active">
+      <div class="hero">
+        <h2>Medir distancia del toro</h2>
+        <p>Guía paso a paso optimizada para móvil.</p>
+        <button id="btnStartAll" class="btn-green btn-xl">Iniciar cámara y calibrar</button>
+      </div>
+    </section>
 
-  <div id="controls">
-    <fieldset>
-      <legend>Cámara</legend>
-      <button id="btnStart" class="btn-green">Iniciar cámara</button>
-      <label><input type="checkbox" id="chkBackCam" checked> Cámara trasera (móvil)</label>
-      <div class="status">Estado: <span id="status">Esperando…</span></div>
-      <div class="readout">FPS: <span id="fps">0</span> · Distancia en vivo: <span id="distance">0.00</span> m</div>
-      <div class="readout final">Distancia final: <span id="finalDistance">—</span></div>
-    </fieldset>
+    <!-- CALIBRATION -->
+    <section id="screen-calib" class="screen">
+      <div class="panel">
+        <h2>1) Calibración del ruedo</h2>
+        <p class="muted">Toca el borde del ruedo en orden <strong>Norte</strong>, <strong>Este</strong>, <strong>Sur</strong>, <strong>Oeste</strong>. Luego confirma diámetro.</p>
+        <div class="row wrap">
+          <label>Diámetro (m):
+            <input id="diam" type="number" step="0.01" value="60" inputmode="decimal">
+          </label>
+          <button id="btnResetPts" class="btn-red">Reiniciar</button>
+          <button id="btnComputeH" class="btn-orange">Calcular homografía</button>
+        </div>
+        <div class="chips">
+          <span class="chip">N: <span id="cN">–</span></span>
+          <span class="chip">E: <span id="cE">–</span></span>
+          <span class="chip">S: <span id="cS">–</span></span>
+          <span class="chip">O: <span id="cW">–</span></span>
+        </div>
+        <div class="hint" id="hintCalib">Toca punto Norte</div>
+        <div class="row end">
+          <button id="btnToSelect" class="btn-green" disabled>Continuar</button>
+        </div>
+      </div>
+    </section>
 
-    <fieldset>
-      <legend>Calibración (círculo)</legend>
-      <p>Haz 4 toques/clics en el borde del ruedo en orden <strong>N</strong>, <strong>E</strong>, <strong>S</strong>, <strong>O</strong>.</p>
-      <div>N: <span id="cN">–</span> &nbsp; E: <span id="cE">–</span> &nbsp; S: <span id="cS">–</span> &nbsp; O: <span id="cW">–</span></div>
-      <label>Diámetro (m): <input id="diam" type="number" step="0.01" value="60"></label><br/>
-      <button id="btnResetPts" class="btn-red">Reset puntos</button>
-      <button id="btnComputeH" class="btn-orange">Calcular homografía</button>
-      <div>H: <span id="Hval">–</span></div>
-      <small>Consejo: la cámara debe estar fija para que la homografía se mantenga válida.</small>
-    </fieldset>
+    <!-- SELECT -->
+    <section id="screen-select" class="screen">
+      <div class="panel">
+        <h2>2) Seleccionar al toro</h2>
+        <p class="muted">Arrastra un rectángulo alrededor del toro. Puedes repetir si hace falta.</p>
+        <div class="row end">
+          <button id="btnStartRun" class="btn-green" disabled>Empezar seguimiento</button>
+        </div>
+      </div>
+    </section>
 
-    <fieldset>
-      <legend>Seguimiento y exportación</legend>
-      <p><strong>Arrastra</strong> con ratón o dedo un rectángulo sobre el toro para iniciar el seguimiento por plantilla.</p>
-      <button id="btnStartRun" disabled class="btn-green">Empezar</button>
-      <button id="btnStopRun" disabled class="btn-red">Parar</button>
-      <button id="btnDownloadCSV" disabled class="btn-blue">CSV</button>
-      <button id="btnDownloadSVG" disabled class="btn-blue">SVG</button>
-    </fieldset>
-  </div>
+    <!-- TRACK -->
+    <section id="screen-track" class="screen">
+      <div class="panel slim">
+        <div class="stats">
+          <span>FPS: <strong id="fps">0</strong></span>
+          <span>Distancia: <strong id="distance">0.00</strong> m</span>
+        </div>
+      </div>
+      <button id="btnStopRun" class="fab btn-red" aria-label="Parar">■</button>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="screen-results" class="screen">
+      <div class="panel">
+        <h2>Resultados</h2>
+        <p class="big">Distancia total: <strong id="finalDistance">0.00 m</strong></p>
+        <div class="row wrap">
+          <button id="btnDownloadCSV" class="btn-blue">Descargar CSV</button>
+          <button id="btnDownloadSVG" class="btn-blue">Descargar SVG</button>
+          <button id="btnShare" class="btn-orange">Compartir</button>
+        </div>
+        <div class="row end">
+          <button id="btnRestart" class="btn-green">Nueva medición</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHARED VIDEO/CANVAS CONTAINER -->
+    <div id="container">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+      <div id="overlay-msg"></div>
+    </div>
+  </main>
 
   <script type="module" src="homography.js"></script>
   <script type="module" src="tracker.js"></script>

@@ -1,4 +1,4 @@
-// Homografía y utilidades — circle mode y auxiliares
+// Homografía y utilidades
 export function computeHomography4(ptsPx, ptsM) {
   if (ptsPx.length !== 4 || ptsM.length !== 4) throw new Error("Se requieren 4 puntos.");
   const A = Array(8).fill(0).map(()=>Array(9).fill(0)); // 8x9 (augmented)
